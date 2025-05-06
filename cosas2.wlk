@@ -1,6 +1,9 @@
+import camion2.*
 object knightRider {
     method peso() = 500
     method peligrosidad() = 10
+    method bultos() = 1
+    method consecuenciaDeLaCarga() {}
 }
 
 object bumblebee{
@@ -16,12 +19,18 @@ object bumblebee{
             15
         }
     }
+    method bultos() = 2
+    method consecuenciaDeLaCarga() {estaTransformado = true}
 }
 object ladrillos{
     var cantidad = 300
     method peso() = cantidad * 2
     method cantidad(unaCantidad){cantidad = unaCantidad}
     method peligrosidad() = 2 
+    method bultos() = if (cantidad <= 100) 1 
+                      else if (cantidad.between(101, 301)) 2
+                      else 3
+    method consecuenciaDeLaCarga() {cantidad += 12}
 }
 
 object arena{
@@ -29,6 +38,8 @@ object arena{
     //method peso() = peso
     //method peso(unPeso) {peso = unPeso}
     method peligrosidad() = 1
+    method bultos() = 1
+    method consecuenciaDeLaCarga() {peso = peso - 10.max(0)}
 }
 
 object bateriaAntiaerea{
@@ -37,6 +48,8 @@ object bateriaAntiaerea{
     method cargarMisiles(){tieneMisiles = true}
     method peso() = if(tieneMisiles) 300 else 200
     method peligrosidad() = if(tieneMisiles) 100 else 0
+    method bultos() = if (tieneMisiles) 2 else 1
+    method consecuenciaDeLaCarga() {self.cargarMisiles()}
 }   
 
 object contenedor{
@@ -49,11 +62,15 @@ object contenedor{
     method peso() = 100 + cosasAdentro.sum({c => c.peso()})
     method peligrosidad() = if (cosasAdentro.isEmpty()) 0 
         else cosasAdentro.max({c => c.peligrosidad()}) 
+    method bultos() = 1 + cosasAdentro.sum({c => c.bultos()})
+    method consecuenciaDeLaCarga() {cosasAdentro.forEach({c => c.consecuenciaDeLaCarga()})}
 }
 
 object residuosRadioactivos{
     var property peso = 100
     method peligrosidad() = 200
+    method bultos() = 1
+    method consecuenciaDeLaCarga() {peso += 15}
 }
 
 object embalaje{
@@ -61,5 +78,7 @@ object embalaje{
     method otroEmbalaje(unaCosa){cosaEmbalada = unaCosa}
     method peso() = cosaEmbalada.peso()
     method peligrosidad() = cosaEmbalada.peligrosidad() / 2
+    method bultos() = 2
+    method consecuenciaDeLaCarga() {}
 }
 
